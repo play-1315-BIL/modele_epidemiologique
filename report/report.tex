@@ -158,6 +158,53 @@ Ainsi, il a pu arriver lors de nos essais que des valeurs de $N$ relativement fa
 Pour l'illustration, nous avons conservé des simulations présentant des écarts qui nous ont semblé représentatifs.
 
 
+\section{Question ouverte : estimation pratique de $\beta$ et $\gamma$}
+
+Les équations différentielles du modèle SIR déterministe sont les suivantes : 
+\begin{align*}
+    \frac{ds}{dt}(t) &= -\beta i(t) s(t)\\
+    \frac{di}{dt}(t) &= (\beta s(t) - \gamma) i(t)\\
+    \frac{dr}{dt}(t) &= \gamma i(t)
+\end{align*}
+
+Un obstacle évident dans l'estimation de $\beta$ et $\gamma$ en partant des données hospitalières de Santé Publique France est que les fonctions $s(t)$, $i(t)$ et $r(t)$ ainsi que leurs dérivées sont inconues.
+Nous proposons donc de nous placer dans les hypothèses suivantes qui nous semblent pertinentes et permettent de pallier le manque de données : 
+\begin{enumerate}
+    \item La proportion $h(t)$ de personnes hospitalisées est une fraction constante de la population infectée : $\exists \alpha \in [0, 1], \; h(t) = \alpha i(t) \; \forall t$
+    \item De la même façon, la proportion $r_h(t)$ de personnes retirées après avoir été hospitalisées est une fraction de la population totale retirée avec le même facteur : $r_h(t) = \alpha r(t) \; \forall t$
+    \item La proportion d'individus susceptibles est proche de 1 (début d'épidémie) : $s(t) \approx 1$
+    \item Le paramètre $\gamma$ est identique pour la population hospitalisée et pour le reste de la population
+    \item La proportion $h(t)$ de la population hospitalisée pour cause de Covid-19 est connue (il suffit de sommer les variations à partir d'un jour donné, mais ce chiffre ne figure pas dans les fichiers)
+\end{enumerate}
+
+\bigskip
+
+Avec ces hypothèses, on peut écrire :
+\begin{align*}
+    \frac{di}{dt}(t) \approx (\beta - \gamma) i(t)  &\Leftrightarrow \alpha \frac{di}{dt}(t) \approx (\beta - \gamma) \alpha i(t)\\
+                                                    &\Leftrightarrow \frac{dh}{dt}(t) \approx (\beta - \gamma) h(t)
+\end{align*}
+Ainsi que :
+\begin{align*}
+    \frac{dr}{dt}(t) = \gamma i(t)  &\Leftrightarrow \alpha \frac{dr}{dt}(t) = \gamma \alpha i(t)\\
+                                                    &\Leftrightarrow \frac{dr_h}{dt}(t) = \gamma h(t)
+\end{align*}
+
+\bigskip
+
+On a donc pour tout $t$ : 
+\begin{align*}
+    \beta &= \frac{1}{h(t)}(\frac{dh}{dt}(t) + \frac{dr_h}{dt}(t))\\
+    \gamma &= \frac{1}{h(t)}\frac{dr_h}{dt}(t)
+\end{align*}
+
+On pourra donc calculer des estimations $\hat\beta$ et $\hat\gamma$ des paramètres en moyennant sur un certain nombre de jours, ce qui revient à minimiser la somme des écarts quadratiques : 
+\begin{align*}
+    \hat\beta &= \frac{1}{t_2 - t_1}\sum_{t = t_1}^{t_2}\frac{1}{h(t)}(\frac{dh}{dt}(t) + \frac{dr_h}{dt}(t))\\
+    \hat\gamma &= \frac{1}{t_2 - t_1}\sum_{t = t_1}^{t_2}\frac{1}{h(t)}\frac{dr_h}{dt}(t)
+\end{align*}
+
+Pour l'application numérique des formules obtenues, les valeurs de $h(t)$ sont supposées connues et les dérivées $\frac{dh}{dt}$ et $\frac{dr_h}{dt}$ peuvent être approchées respectivement à partir des variations journalières du nombre de patients hospitalisés et du nombre de décès et de retours à domicile.
 
 
 \end{document}
